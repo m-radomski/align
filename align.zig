@@ -12,8 +12,9 @@ const EqlLine = struct {
 pub fn main() anyerror!void {
   var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
   var allocator = &arena.allocator;
+  defer arena.deinit();
 
-  var stdinInput = try std.io.getStdIn().reader().readAllAlloc(allocator, 10 * Megabyte);
+  var stdinInput = try std.io.getStdIn().reader().readAllAlloc(allocator, 1000 * Megabyte);
 
   var eqlLines = std.ArrayList(EqlLine).init(allocator);
   var linesIt = std.mem.split(u8, stdinInput, "\n");
