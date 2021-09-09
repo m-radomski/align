@@ -21,18 +21,22 @@ pub fn main() anyerror!void {
 
     var maxEqlPos: usize = 0;
     while (linesIt.next()) |line| {
-        var trimmedLine = std.mem.trimLeft(u8, line, &std.ascii.spaces);
-        var whitespace = line[0 .. line.len - trimmedLine.len];
+        if (line.len > 0) {
+            var trimmedLine = std.mem.trim(u8, line, &std.ascii.spaces);
+            var whitespace = line[0 .. line.len - trimmedLine.len];
 
-        var insertLine: Line = .{ .startWhitespace = whitespace, .line = trimmedLine, .eqlPos = null };
+            var insertLine: Line = .{ .startWhitespace = whitespace, .line = trimmedLine, .eqlPos = null };
 
-        if (std.mem.indexOf(u8, trimmedLine, "=")) |eqlPos| {
-            insertLine.eqlPos = eqlPos;
-            maxEqlPos = std.math.max(maxEqlPos, eqlPos);
+            if (std.mem.indexOf(u8, trimmedLine, "=")) |eqlPos| {
+                insertLine.eqlPos = eqlPos;
+                maxEqlPos = std.math.max(maxEqlPos, eqlPos);
+            }
+
+            try lines.append(insertLine);
         }
-
-        try lines.append(insertLine);
     }
+
+    std.debug.print("lines: length = {}\n", .{lines.items.len});
 
     const spaces = " " ** 128;
 
@@ -45,7 +49,7 @@ pub fn main() anyerror!void {
                 line.line[eqlPos..],
             });
         } else {
-          std.debug.print("{s}{s}\n", .{ line.startWhitespace, line.line });
+            std.debug.print("{s}{s}\n", .{ line.startWhitespace, line.line });
         }
     }
 }
